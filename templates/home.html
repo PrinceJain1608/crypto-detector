@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold"><i class="bi bi-shield-lock-fill text-primary"></i> Crypto Primitive Detector</h1>
+        <p class="lead fs-4 text-body-secondary mt-3">AI/ML-powered tool for detecting cryptographic algorithms in firmware binaries</p>
+        <div class="mt-4">
+            {% if 'user' in session %}
+            <a href="/analysis" class="btn btn-primary btn-lg me-3"><i class="bi bi-upload me-2"></i> Start New Analysis</a>
+            <a href="/history" class="btn btn-outline-primary btn-lg"><i class="bi bi-clock-history me-2"></i> View History</a>
+            {% else %}
+            <a href="/register" class="btn btn-primary btn-lg me-3"><i class="bi bi-person-plus me-2"></i> Get Started</a>
+            <a href="/login" class="btn btn-outline-primary btn-lg"><i class="bi bi-box-arrow-in-right me-2"></i> Login</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <h2 class="text-center mb-5 fw-bold">Key Features</h2>
+    <div class="row g-5">
+        <!-- Rule-Based Detection -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-body text-center p-5">
+                    <i class="bi bi-key-fill display-1 text-success mb-4"></i>
+                    <h3 class="fw-bold">Rule-Based Detection</h3>
+                    <p class="fs-5 text-body-secondary">Scans for known constants like AES S-box tables, SHA round constants, MD5 tables, and more.</p>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center py-4">
+                    <small class="text-body-secondary">Reliable signature matching for quick crypto identification</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ML Classification -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-body text-center p-5">
+                    <i class="bi bi-robot display-1 text-info mb-4"></i>
+                    <h3 class="fw-bold">ML Classification</h3>
+                    <p class="fs-5 text-body-secondary">Disassembles code and uses machine learning (Random Forest) to flag crypto-like functions based on opcode patterns.</p>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center py-4">
+                    <small class="text-body-secondary">Advanced detection for obfuscated or custom implementations</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Multi-Architecture -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-body text-center p-5">
+                    <i class="bi bi-cpu-fill display-1 text-warning mb-4"></i>
+                    <h3 class="fw-bold">Multi-Architecture Support</h3>
+                    <p class="fs-5 text-body-secondary">Fully supports ARM, ARM64, MIPS32, x86_64, and more via Capstone disassembly engine.</p>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center py-4">
+                    <small class="text-body-secondary">Works with IoT routers, embedded devices, and desktop binaries</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent History (if logged in) -->
+    {% if 'user' in session and history %}
+    <h2 class="text-center mt-5 mb-4 fw-bold">Your Recent Analyses</h2>
+    <div class="row g-4">
+        {% for item in history[:3] %}
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-file-binary"></i> {{ item[2] }}</h6>
+                    <p class="card-text"><small>Arch: {{ item[3] }} • {{ item[4] }}</small></p>
+                    <a href="/export_pdf/{{ item[0] }}" class="btn btn-sm btn-outline-primary">View PDF</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="text-center mt-3">
+            <a href="/history" class="btn btn-outline-primary">View All History →</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

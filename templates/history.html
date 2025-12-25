@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold"><i class="bi bi-clock-history text-primary"></i> Analysis History</h1>
+        <p class="lead text-body-secondary">View and download your past firmware crypto detections</p>
+    </div>
+
+    {% if history %}
+    <div class="row g-4">
+        {% for item in history %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-file-binary me-2"></i>{{ item[2] }}</h5> {# File Name #}
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-cpu text-primary me-3"></i>
+                                <div>
+                                    <small class="text-body-secondary">Architecture</small>
+                                    <p class="mb-0 fw-semibold">{{ item[3] }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-calendar-event text-info me-3"></i>
+                                <div>
+                                    <small class="text-body-secondary">Analyzed On</small>
+                                    <p class="mb-0 fw-semibold">{{ item[4] }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/export_pdf/{{ item[0] }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-file-earmark-pdf me-1"></i> PDF Report
+                        </a>
+                        <a href="/export_csv/{{ item[0] }}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-file-earmark-spreadsheet me-1"></i> CSV Data
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-inbox display-1 text-body-secondary opacity-50"></i>
+        <h3 class="mt-4 text-body-secondary">No Analysis History Yet</h3>
+        <p class="lead text-body-secondary">Start analyzing firmware files to see your history here.</p>
+        <a href="/analysis" class="btn btn-primary btn-lg mt-3">
+            <i class="bi bi-upload me-2"></i> Analyze Now
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="text-center my-5">
+    <h1 class="display-5 fw-bold text-primary"><i class="bi bi-shield-lock-fill"></i> Analysis Results</h1>
+    <p class="lead text-muted">Detailed cryptographic primitive detection report</p>
+</div>
+
+{% for res in results %}
+<div class="card bg-dark border-primary shadow-lg mb-5 rounded-4 overflow-hidden">
+    <div class="card-header bg-primary text-white py-4">
+        <h3 class="mb-0"><i class="bi bi-cpu me-3"></i>{{ res.file }}</h3>
+        <small class="text-light opacity-75">Firmware Binary Analysis</small>
+    </div>
+    <div class="card-body p-5">
+        <ul class="nav nav-pills nav-fill mb-5" role="tablist">
+            <li class="nav-item"><a class="nav-link active rounded-pill" data-bs-toggle="tab" href="#const-{{ loop.index0 }}"><i class="bi bi-key-fill"></i> Constants</a></li>
+            <li class="nav-item"><a class="nav-link rounded-pill" data-bs-toggle="tab" href="#ml-{{ loop.index0 }}"><i class="bi bi-robot"></i> ML Analysis</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Constants Tab -->
+            <div class="tab-pane fade show active" id="const-{{ loop.index0 }}">
+                {% if res.result.constants %}
+                <div class="row g-4">
+                    {% for algo, matches in res.result.constants.items() %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card bg-secondary border-success h-100 shadow-sm">
+                            <div class="card-body text-center py-4">
+                                <i class="bi bi-check-circle-fill display-4 text-success mb-3"></i>
+                                <h4 class="text-uppercase fw-bold">{{ algo }}</h4>
+                                <p class="display-6 fw-bold text-success">{{ matches|length }}</p>
+                                <p class="text-muted">matches detected</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info text-center py-5">
+                    <i class="bi bi-info-circle display-4"></i>
+                    <h4>No cryptographic constants found</h4>
+                    <p>Try uploading extracted libraries (e.g., libcrypto.so) for deeper detection.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- ML Tab -->
+            <div class="tab-pane fade" id="ml-{{ loop.index0 }}">
+                {% if 'error' in res.result.ml %}
+                <div class="alert alert-warning text-center py-5">
+                    <i class="bi bi-exclamation-triangle-fill display-4"></i>
+                    <h4>Disassembly Failed</h4>
+                    <p>{{ res.result.ml.error }}</p>
+                    <small>Tip: Upload individual ELF binaries from extracted firmware.</small>
+                </div>
+                {% else %}
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card bg-secondary">
+                            <div class="card-body text-center">
+                                <i class="bi bi-diagram-3 display-4 text-info"></i>
+                                <h5>Functions Disassembled</h5>
+                                <p class="display-5 fw-bold">{{ res.result.ml.functions }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-secondary">
+                            <div class="card-body text-center">
+                                <i class="bi bi-cpu-fill display-4 text-warning"></i>
+                                <h5>Potential Crypto Functions</h5>
+                                <p class="display-5 fw-bold text-warning">{{ res.result.ml.crypto|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if res.result.ml.features and res.result.ml.features|length > 0 %}
+                    {% set avg_bitwise = ((res.result.ml.features|map(attribute='bitwise_ratio')|sum) / res.result.ml.features|length)|round(4) * 100 %}
+                    {% set avg_arithmetic = ((res.result.ml.features|map(attribute='arithmetic_ratio')|sum) / res.result.ml.features|length)|round(4) * 100 %}
+                    {% set avg_loadstore = ((res.result.ml.features|map(attribute='load_store_ratio')|sum) / res.result.ml.features|length)|round(4) * 100 %}
+
+                    <h4 class="text-center mb-4">Average Opcode Ratios</h4>
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <canvas id="chart-{{ loop.index0 }}" height="300"></canvas>
+                        </div>
+                    </div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', () => {
+                            const ctx = document.getElementById('chart-{{ loop.index0 }}').getContext('2d');
+                            new Chart(ctx, {
+                                type: 'doughnut',
+                                data: {
+                                    labels: ['Bitwise Operations', 'Arithmetic', 'Load/Store'],
+                                    datasets: [{
+                                        data: [{{ avg_bitwise }}, {{ avg_arithmetic }}, {{ avg_loadstore }}],
+                                        backgroundColor: ['#00ff9d', '#0d6efd', '#ffc107'],
+                                        borderWidth: 0
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    plugins: {
+                                        legend: { position: 'bottom', labels: { color: '#fff' } }
+                                    }
+                                }
+                            });
+                        });
+                    </script>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-search display-4 text-muted"></i>
+                    <p>No features extracted. Upload disassemblable ELF files for ML insights.</p>
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold"><i class="bi bi-upload text-primary"></i> Firmware Analysis</h1>
+        <p class="lead text-body-secondary">Upload binaries to detect cryptographic primitives with AI/ML</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="card-body p-5">
+                    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                        <!-- Drag & Drop Zone -->
+                        <div class="border border-primary border-3 rounded-4 p-5 text-center mb-5 position-relative overflow-hidden" 
+                             id="dropZone" style="background: rgba(var(--bs-primary-rgb), 0.05); transition: all 0.3s ease;">
+                            <i class="bi bi-cloud-arrow-up-fill display-1 text-primary opacity-75"></i>
+                            <h4 class="mt-4 fw-semibold">Drag & Drop Files Here</h4>
+                            <p class="text-body-secondary mb-4">or click to browse • Multiple files supported</p>
+                            <input type="file" name="files" id="fileInput" multiple class="d-none" accept=".bin,.img,.firmw,.elf,.so" required>
+                            <button type="button" class="btn btn-outline-primary btn-lg px-5" onclick="document.getElementById('fileInput').click()">
+                                <i class="bi bi-folder-plus me-2"></i> Select Files
+                            </button>
+                            <div id="fileList" class="mt-4 text-start"></div>
+                        </div>
+
+                        <!-- Architecture Selection -->
+                        <div class="mb-5">
+                            <label for="arch" class="form-label fw-semibold fs-5">
+                                <i class="bi bi-cpu me-2"></i> Target Architecture
+                            </label>
+                            <select name="arch" id="arch" class="form-select form-select-lg">
+                                <option value="ARM">ARM (32-bit)</option>
+                                <option value="ARM64">ARM64 (AArch64)</option>
+                                <option value="x86_64">x86_64</option>
+                                <option value="MIPS32" selected>MIPS32 (Common in routers)</option>
+                            </select>
+                            <div class="form-text">Choose based on your device's CPU</div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg fw-bold py-3">
+                                <i class="bi bi-search me-2"></i> Start Crypto Detection
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Progress Bar (Fake for UX) -->
+                    <div class="progress mt-5" style="height: 8px; display: none;" id="progressBar">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                             role="progressbar" style="width: 0%">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips Card -->
+            <div class="card mt-5 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-lightbulb text-warning"></i> Pro Tips</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent">For best ML results, extract firmware first (use 7-Zip or binwalk) and upload individual ELF files (e.g., libcrypto.so).</li>
+                        <li class="list-group-item bg-transparent">Full .bin files work great for detecting constants like AES S-box.</li>
+                        <li class="list-group-item bg-transparent">Common detections: AES, SHA, MD5 in OpenSSL libraries.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Drag & Drop Effects
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    ['dragover', 'dragenter'].forEach(event => {
+        dropZone.addEventListener(event, e => {
+            e.preventDefault();
+            dropZone.style.background = 'rgba(var(--bs-primary-rgb), 0.15)';
+            dropZone.style.borderColor = 'var(--bs-success)';
+        });
+    });
+
+    ['dragleave', 'dragend'].forEach(event => {
+        dropZone.addEventListener(event, () => {
+            dropZone.style.background = 'rgba(var(--bs-primary-rgb), 0.05)';
+            dropZone.style.borderColor = 'var(--bs-primary)';
+        });
+    });
+
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.style.background = 'rgba(var(--bs-primary-rgb), 0.05)';
+        dropZone.style.borderColor = 'var(--bs-primary)';
+        fileInput.files = e.dataTransfer.files;
+        updateFileList();
+    });
+
+    fileInput.addEventListener('change', updateFileList);
+
+    function updateFileList() {
+        fileList.innerHTML = '';
+        if (fileInput.files.length > 0) {
+            const ul = document.createElement('ul');
+            ul.className = 'list-group';
+            Array.from(fileInput.files).forEach(file => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center bg-transparent';
+                li.innerHTML = `
+                    <span><i class="bi bi-file-binary me-2"></i>${file.name}</span>
+                    <small class="text-body-secondary">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                `;
+                ul.appendChild(li);
+            });
+            fileList.appendChild(ul);
+        }
+    }
+
+    // Fake Progress on Submit
+    document.getElementById('uploadForm').addEventListener('submit', () => {
+        const progressBar = document.getElementById('progressBar');
+        const bar = progressBar.querySelector('.progress-bar');
+        progressBar.style.display = 'block';
+        let width = 0;
+        const interval = setInterval(() => {
+            width += Math.random() * 15 + 5;
+            if (width >= 100) {
+                clearInterval(interval);
+                width = 100;
+            }
+            bar.style.width = width + '%';
+            bar.textContent = Math.round(width) + '%';
+        }, 400);
+    });
+</script>
+{% endblock %}

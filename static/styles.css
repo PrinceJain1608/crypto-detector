@@ -1,0 +1,4 @@
+body { background: #0d1117; }
+.drop-zone { background: #161b22; cursor: pointer; }
+.drop-zone:hover { background: #21262d; }
+.alert-success { background: rgba(25, 135, 84, 0.3); border-color: #198754; }

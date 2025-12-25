@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center gy-5">
+        <div class="col-lg-6 text-center text-lg-start">
+            <h1 class="display-4 fw-bold mb-4"><i class="bi bi-shield-shaded"></i> About Crypto Primitive Detector</h1>
+            <p class="lead fs-4 mb-4">An advanced AI/ML-powered web tool designed for identifying cryptographic algorithms and primitives in multi-architecture firmware binaries.</p>
+            <p class="fs-5 opacity-75">Perfect for reverse engineers, IoT security researchers, and firmware analysts.</p>
+            <div class="mt-5">
+                <a href="/analysis" class="btn btn-primary btn-lg me-3"><i class="bi bi-upload"></i> Start Analyzing</a>
+                <a href="https://github.com/PrinceJain1608" class="btn btn-outline-primary btn-lg"><i class="bi bi-github"></i> View on GitHub</a>
+            </div>
+        </div>
+        <div class="col-lg-6 text-center">
+            <i class="bi bi-hdd-network-fill display-1 opacity-50"></i>
+        </div>
+    </div>
+
+    <div class="row mt-5 g-4 text-center">
+        <div class="col-md-4">
+            <div class="p-4">
+                <i class="bi bi-key-fill display-3 text-primary"></i>
+                <h4 class="mt-3">Rule-Based Detection</h4>
+                <p class="opacity-75">Matches known constants like AES S-box, SHA round constants, MD5 tables.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4">
+                <i class="bi bi-cpu-fill display-3 text-primary"></i>
+                <h4 class="mt-3">ML Classification</h4>
+                <p class="opacity-75">Disassembles code and uses Random Forest to flag crypto-like functions.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4">
+                <i class="bi bi-globe display-3 text-primary"></i>
+                <h4 class="mt-3">Multi-Architecture</h4>
+                <p class="opacity-75">Supports ARM, ARM64, MIPS32, x86_64 with Capstone disassembly.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5 py-5 rounded-4 border-top border-bottom">
+        <p class="fs-5">Built with Flask • Bootstrap • Chart.js • Capstone • scikit-learn</p>
+        <p class="opacity-75">Made for the security community ❤️</p>
+    </div>
+</div>
+{% endblock %}
