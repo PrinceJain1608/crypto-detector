@@ -8,3 +8,4 @@ joblib==1.4.2
 werkzeug==3.0.4
 reportlab==4.2.5  # For PDF export
 pandas==2.2.3  # For CSV export
+gunicorn
